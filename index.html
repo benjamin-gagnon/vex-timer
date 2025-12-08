@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VEX Robotics 2-Minute Timer</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('https://www.vexrobotics.com/media/catalog/product/v/e/vex-v5-hero-3.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+      text-align: center;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.65);
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #timer {
+      font-size: 10.5rem;
+      margin-bottom: 20px;
+      letter-spacing: 4px;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    button {
+      font-size: 1.6rem;
+      padding: 12px 28px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #ff3b3b;
+      color: white;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background-color: #d32f2f;
+    }
+
+    .scoreboard {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .score-box {
+      background: rgba(0,0,0,0.6);
+      padding: 10px;
+      border-radius: 10px;
+      width: 22%;
+    }
+
+    .score-box h2 {
+      margin: 0 0 10px 0;
+    }
+
+    .score-input {
+      width: 80px;
+      padding: 10px;
+      font-size: 1.5rem;
+      text-align: center;
+      border-radius: 8px;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div id="timer">02:00</div>
+
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+    <button onclick="toggleFullscreen()">Fullscreen</button>
+  </div>
+
+  <div class="scoreboard">
+    <div class="score-box" style="border: 2px solid red;">
+      <h2>Red Team</h2>
+      <input class="score-input" type="number" id="redScore" value="0" />
+    </div>
+
+    <div class="score-box" style="border: 2px solid #3b82f6;">
+      <h2>Blue Team</h2>
+      <input class="score-input" type="number" id="blueScore" value="0" />
+    </div>
+  </div>
+
+  <!-- Sounds -->
+  <audio id="startBell" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm.ogg"></audio>
+  <audio id="warningSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+  <audio id="endBuzzer" src="https://actions.google.com/sounds/v1/alarms/buzzer.ogg"></audio>
+
+  <script>
+    let time = 120;
+    let interval = null;
+    let warned = false;
+
+    function updateDisplay() {
+      let minutes = Math.floor(time / 60);
+      let seconds = time % 60;
+      const timerElement = document.getElementById('timer');
+
+      timerElement.innerText =
+        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+      if (time <= 15) {
+        timerElement.style.transform = 'scale(1.25)';
+        timerElement.style.color = '#ff5757';
+      } else {
+        timerElement.style.transform = 'scale(1)';
+        timerElement.style.color = 'white';
+      }
+    }
+
+    function startTimer() {
+      document.getElementById('startBell').play();
+      if (interval) return;
+      interval = setInterval(() => {
+        if (time > 0) {
+          time--;
+
+          if (time === 15 && !warned) {
+            document.getElementById('warningSound').play();
+            warned = true;
+          }
+
+          updateDisplay();
+        } else {
+          clearInterval(interval);
+          interval = null;
+          document.getElementById('endBuzzer').play();
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(interval);
+      interval = null;
+    }
+
+    function resetTimer() {
+      clearInterval(interval);
+      interval = null;
+      time = 120;
+      warned = false;
+      updateDisplay();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
