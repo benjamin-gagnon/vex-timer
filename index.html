@@ -28,10 +28,16 @@
     }
 
     #timer {
-      font-size: 10.5rem;
+      font-size: 12.6rem;
       margin-bottom: 20px;
       letter-spacing: 4px;
       transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     button {
@@ -77,32 +83,93 @@
       border-radius: 8px;
       border: none;
     }
+
+    .red-team-box {
+      border: 2px solid red;
+    }
+
+    .blue-team-box {
+      border: 2px solid #3b82f6;
+    }
+
+    .blue-team-box .score-buttons button {
+      background-color: #3b82f6;
+    }
+
+    .blue-team-box .score-buttons button:hover {
+      background-color: #2563eb;
+    }
+
+    .score-buttons {
+      margin-top: 10px;
+    }
+
+    .score-buttons button {
+      font-size: 1rem;
+      padding: 5px 10px;
+      margin: 2px;
+      border-radius: 5px;
+    }
+
+    .blue-team-box .clear-btn {
+      background-color: #3b82f6;
+    }
+    .blue-team-box .clear-btn:hover {
+      background-color: #2563eb;
+    }
   </style>
 </head>
 <body>
   <div class="overlay">
     <div id="timer">02:00</div>
 
-    <button onclick="startTimer()">Start</button>
-    <button onclick="pauseTimer()">Pause</button>
-    <button onclick="resetTimer()">Reset</button>
-    <button onclick="toggleFullscreen()">Fullscreen</button>
+    <div class="controls">
+      <button onclick="startTimer()">Start</button>
+      <button onclick="pauseTimer()">Pause</button>
+      <button onclick="resetTimer()">Reset</button>
+    </div>
   </div>
 
   <div class="scoreboard">
-    <div class="score-box" style="border: 2px solid red;">
+    <div class="score-box red-team-box">
       <h2>Red Team</h2>
       <input class="score-input" type="number" id="redScore" value="0" />
+      <div class="score-buttons">
+        <button onclick="updateScore('red', 3)">+3</button>
+        <button onclick="updateScore('red', 6)">low goal +6</button>
+        <button onclick="updateScore('red', 8)">high goal/park +8</button>
+        <button onclick="updateScore('red', 10)">long goal control +10</button>
+      </div>
+      <div class="score-buttons">
+        <button onclick="updateScore('red', -3)">-3</button>
+        <button onclick="updateScore('red', -6)">-6</button>
+        <button onclick="updateScore('red', -8)">-8</button>
+        <button onclick="updateScore('red', -10)">-10</button>
+        <button class="clear-btn" onclick="clearScore('red')">Clear Score</button>
+      </div>
     </div>
 
-    <div class="score-box" style="border: 2px solid #3b82f6;">
+    <div class="score-box blue-team-box">
       <h2>Blue Team</h2>
       <input class="score-input" type="number" id="blueScore" value="0" />
+      <div class="score-buttons">
+        <button onclick="updateScore('blue', 3)">+3</button>
+        <button onclick="updateScore('blue', 6)">low goal +6</button>
+        <button onclick="updateScore('blue', 8)">high goal/park +8</button>
+        <button onclick="updateScore('blue', 10)">long goal control +10</button>
+      </div>
+      <div class="score-buttons">
+        <button onclick="updateScore('blue', -3)">-3</button>
+        <button onclick="updateScore('blue', -6)">-6</button>
+        <button onclick="updateScore('blue', -8)">-8</button>
+        <button onclick="updateScore('blue', -10)">-10</button>
+        <button class="clear-btn" onclick="clearScore('blue')">Clear Score</button>
+      </div>
     </div>
   </div>
 
   <!-- Sounds -->
-  <audio id="startBell" src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm.ogg"></audio>
+  <audio id="startBell" src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Charge_fanfare.ogg"></audio>
   <audio id="warningSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
   <audio id="endBuzzer" src="https://actions.google.com/sounds/v1/alarms/buzzer.ogg"></audio>
 
@@ -162,12 +229,18 @@
       updateDisplay();
     }
 
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
+    function updateScore(team, amount) {
+      const scoreInput = document.getElementById(team + 'Score');
+      let currentScore = parseInt(scoreInput.value, 10);
+      if (isNaN(currentScore)) {
+        currentScore = 0;
       }
+      scoreInput.value = Math.max(0, currentScore + amount); // Prevent negative scores
+    }
+
+    function clearScore(team) {
+      const scoreInput = document.getElementById(team + 'Score');
+      scoreInput.value = 0;
     }
 
     updateDisplay();
