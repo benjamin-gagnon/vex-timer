@@ -18,7 +18,9 @@
     }
 
     .overlay {
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.55);
+      position: relative;
+      z-index: 10;
       width: 100%;
       height: 100vh;
       display: flex;
@@ -29,7 +31,6 @@
 
     #timer {
       font-size: 12.6rem;
-      margin-bottom: 20px;
       letter-spacing: 4px;
       transition: transform 0.3s ease, color 0.3s ease;
     }
@@ -62,6 +63,8 @@
       width: 100%;
       display: flex;
       justify-content: space-around;
+      pointer-events: none; /* Allow clicks to pass through the container */
+      z-index: 11; /* Ensure scoreboard is on top of the overlay */
     }
 
     .score-box {
@@ -69,6 +72,7 @@
       padding: 10px;
       border-radius: 10px;
       width: 22%;
+      pointer-events: auto; /* Make the score boxes clickable again */
     }
 
     .score-box h2 {
@@ -122,10 +126,9 @@
 <body>
   <div class="overlay">
     <div id="timer">02:00</div>
-
     <div class="controls">
       <button onclick="startTimer()">Start</button>
-      <button onclick="pauseTimer()">Pause</button>
+      <button onclick="stopTimer()">Stop</button>
       <button onclick="resetTimer()">Reset</button>
     </div>
   </div>
@@ -216,7 +219,7 @@
       }, 1000);
     }
 
-    function pauseTimer() {
+    function stopTimer() {
       clearInterval(interval);
       interval = null;
     }
